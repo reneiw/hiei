@@ -1,6 +1,6 @@
-<h1 align="center"> hiei </h1>
+# Hiei
 
-<p align="center"> Http request Is Especially Import!.</p>
+- Http request Is Especially Import!.
 
 ## Prompt
 
@@ -9,6 +9,8 @@ then you can try [caseyamcl/guzzle_retry_middleware](https://github.com/caseyamc
 I think you will like him.
 
 ## Installing
+
+Via Composer
 
 ```shell
 $ composer require reneiw/hiei -vvv
