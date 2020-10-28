@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Reneiw\Hiei;
-
 
 use Closure;
 use DateTime;
@@ -12,8 +10,6 @@ use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-
-use function GuzzleHttp\Promise\rejection_for;
 
 /**
  * Complate Middleware
