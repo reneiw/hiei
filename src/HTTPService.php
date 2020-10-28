@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Reneiw\Hiei;
-
 
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
