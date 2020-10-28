@@ -10,10 +10,16 @@ use Psr\Http\Message\ResponseInterface;
 class HTTPService
 {
     protected ClientInterface $client;
+    protected array $errorCallback = [];
 
-    public function __construct(ClientInterface $client)
+
+    public function __construct(ClientInterface $client, $options)
     {
         $this->client = $client;
+
+        if ($options['errorCallback']) {
+            $this->errorCallback = $options['errorCallback'];
+        }
     }
 
     public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
@@ -46,6 +52,11 @@ class HTTPService
         try {
             return $this->handleSuccess($this->getClient()->request($method, $uri, $guzzleParams));
         } catch (GuzzleException $e) {
+            if ($this->errorCallback) {
+                foreach ($this->errorCallback as $callback) {
+                    call_user_func_array($callback, [$method, $uri, $params, $e]);
+                }
+            }
             return $this->handleFailure($e);
         }
     }
