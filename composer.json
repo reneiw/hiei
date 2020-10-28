@@ -13,7 +13,10 @@
     "autoload": {
         "psr-4": {
             "Reneiw\\Hiei\\": "src"
-        }
+        },
+        "files": [
+            "src/helpers.php"
+        ]
     },
     "require": {
         "php": "^7.4",
