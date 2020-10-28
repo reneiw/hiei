@@ -96,5 +96,4 @@ class HTTPService
     {
         return $this->client;
     }
-
 }
