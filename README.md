@@ -2,6 +2,11 @@
 
 <p align="center"> Http request Is Especially Import!.</p>
 
+## Prompt
+
+If you just need a returnable middleware.  
+then you can try [caseyamcl/guzzle_retry_middleware](https://github.com/caseyamcl/guzzle_retry_middleware).  
+I think you will like him.
 
 ## Installing
 
@@ -25,4 +30,4 @@ _The code contribution process is not very formal. You just need to make sure th
 
 ## License
 
-MIT
+The MIT License (MIT). Please see [License File](LICENSE.md) for more information.
