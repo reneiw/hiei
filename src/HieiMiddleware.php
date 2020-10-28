@@ -12,7 +12,7 @@ use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 /**
- * Complate Middleware
+ * Complex Middleware
  *
  * Guzzle 6 middleware that retries requests when encountering responses
  * with certain conditions (429 or 503).  This middleware also respects
@@ -37,35 +37,35 @@ class HieiMiddleware
     private $defaultOptions = [
 
         // Retry enabled.  Toggle retry on or off per request
-        'retry_enabled'                    => true,
+        'retry_enabled' => true,
 
         // If server doesn't provide a Retry-After header, then set a default back-off delay
         // NOTE: This can either be a float, or it can be a callable that returns a (accepts count and response|null)
-        'default_retry_multiplier'         => 1.5,
+        'default_retry_multiplier' => 1.5,
 
         // Set a maximum number of attempts per request
-        'max_retry_attempts'               => 10,
+        'max_retry_attempts' => 10,
 
         // Set this to TRUE to retry only if the HTTP Retry-After header is specified
         'retry_only_if_retry_after_header' => false,
 
         // Only retry when status is equal to these response codes
-        'retry_on_status'                  => ['429', '503'],
+        'retry_on_status' => ['429', '503'],
 
         // Callback to trigger when delay occurs (accepts count, delay, request, response, options)
-        'on_retry_callback'                => null,
+        'on_retry_callback' => null,
 
         // Retry on connect timeout?
-        'retry_on_timeout'                 => false,
+        'retry_on_timeout' => false,
 
         // Add the number of retries to an X-Header
-        'expose_retry_header'              => false,
+        'expose_retry_header' => false,
 
         // The header key
-        'retry_header'                     => self::RETRY_HEADER,
+        'retry_header' => self::RETRY_HEADER,
 
         // The retry after header key
-        'retry_after_header'               => self::RETRY_AFTER_HEADER,
+        'retry_after_header' => self::RETRY_AFTER_HEADER,
 
         // Proxy enabled.  Toggle retry on or off per request
         'proxy_enable' => false,
@@ -82,7 +82,8 @@ class HieiMiddleware
      * Example:
      * <code>$handlerStack->push(GuzzleRetryMiddleware::factory());</code>
      *
-     * @param array $defaultOptions
+     * @param  array  $defaultOptions
+     *
      * @return Closure
      */
     public static function factory(array $defaultOptions = []): Closure
@@ -95,8 +96,8 @@ class HieiMiddleware
     /**
      * GuzzleRetryMiddleware constructor.
      *
-     * @param callable $nextHandler
-     * @param array $defaultOptions
+     * @param  callable  $nextHandler
+     * @param  array  $defaultOptions
      */
     public function __construct(callable $nextHandler, array $defaultOptions = [])
     {
@@ -105,8 +106,9 @@ class HieiMiddleware
     }
 
     /**
-     * @param RequestInterface $request
-     * @param array $options
+     * @param  RequestInterface  $request
+     * @param  array  $options
+     *
      * @return Promise
      */
     public function __invoke(RequestInterface $request, array $options): Promise
@@ -115,7 +117,7 @@ class HieiMiddleware
         $options = array_replace($this->defaultOptions, $options);
 
         // Set the retry count if not already set
-        if (! isset($options['retry_count'])) {
+        if (!isset($options['retry_count'])) {
             $options['retry_count'] = 0;
         }
 
@@ -133,8 +135,9 @@ class HieiMiddleware
      * Depending on where this middleware is in the stack, the response could still
      * be unsuccessful (e.g. 429 or 503), so check to see if it should be retried
      *
-     * @param RequestInterface $request
-     * @param array $options
+     * @param  RequestInterface  $request
+     * @param  array  $options
+     *
      * @return callable
      */
     protected function onFulfilled(RequestInterface $request, array $options): callable
@@ -152,8 +155,9 @@ class HieiMiddleware
      * If the reason is a BadResponseException exception, check to see if
      * the request can be retried.  Otherwise, pass it on.
      *
-     * @param RequestInterface $request
-     * @param array $options
+     * @param  RequestInterface  $request
+     * @param  array  $options
+     *
      * @return callable
      */
     protected function onRejected(RequestInterface $request, array $options): callable
@@ -180,7 +184,8 @@ class HieiMiddleware
     /**
      * Decide whether or not to retry on connect exception
      *
-     * @param array $options
+     * @param  array  $options
+     *
      * @return bool
      */
     protected function shouldRetryConnectException(array $options): bool
@@ -198,18 +203,19 @@ class HieiMiddleware
      * 1. The response status code against the status codes that should be retried
      * 2. The number of attempts made thus far for this request
      *
-     * @param array $options
-     * @param ResponseInterface|null $response
+     * @param  array  $options
+     * @param  ResponseInterface|null  $response
+     *
      * @return bool  TRUE if the response should be retried, FALSE if not
      */
     protected function shouldRetryHttpResponse(array $options, ResponseInterface $response): bool
     {
-        $statuses = array_map('\intval', (array) $options['retry_on_status']);
+        $statuses = array_map('\intval', (array)$options['retry_on_status']);
 
         switch (true) {
             case $options['retry_enabled'] === false:
             case $this->countRemainingRetries($options) === 0: // No Retry-After header, and it is required?  Give up
-            case (! $response->hasHeader('Retry-After') && $options['retry_only_if_retry_after_header']):
+            case (!$response->hasHeader('Retry-After') && $options['retry_only_if_retry_after_header']):
                 return false;
 
             // Conditions met; see if status code matches one that can be retried
@@ -220,16 +226,16 @@ class HieiMiddleware
 
     /**
      * Count the number of retries remaining.  Always returns 0 or greater.
-     * @param array $options
+     *
+     * @param  array  $options
+     *
      * @return int
      */
     protected function countRemainingRetries(array $options): int
     {
-        $retryCount  = isset($options['retry_count']) ? (int) $options['retry_count'] : 0;
+        $retryCount = intval($options['retry_count'] ?? 0) ?: 0;
 
-        $numAllowed  = isset($options['max_retry_attempts'])
-            ? (int) $options['max_retry_attempts']
-            : $this->defaultOptions['max_retry_attempts'];
+        $numAllowed = intval($options['max_retry_attempts'] ?? 0) ?: $this->defaultOptions['max_retry_attempts'];
 
         return max([$numAllowed - $retryCount, 0]);
     }
@@ -239,9 +245,10 @@ class HieiMiddleware
      *
      * Increments the retry count, determines the delay (timeout), executes callbacks, sleeps, and re-send the request
      *
-     * @param RequestInterface $request
-     * @param array $options
-     * @param ResponseInterface|null $response
+     * @param  RequestInterface  $request
+     * @param  array  $options
+     * @param  ResponseInterface|null  $response
+     *
      * @return Promise
      */
     protected function doRetry(RequestInterface $request, array $options, ResponseInterface $response = null): Promise
@@ -257,25 +264,26 @@ class HieiMiddleware
             call_user_func_array(
                 $options['on_retry_callback'],
                 [
-                    (int) $options['retry_count'],
-                    (float) $delayTimeout,
+                    (int)$options['retry_count'],
+                    (float)$delayTimeout,
                     &$request,
                     &$options,
-                    $response
+                    $response,
                 ]
             );
         }
 
         // Delay!
-        usleep(((int) $delayTimeout) * 1000000);
+        usleep(((int)$delayTimeout) * 1000000);
 
         // Return
         return $this($request, $options);
     }
 
     /**
-     * @param array $options
-     * @param ResponseInterface $response
+     * @param  array  $options
+     * @param  ResponseInterface  $response
+     *
      * @return ResponseInterface
      */
     protected function returnResponse(array $options, ResponseInterface $response): ResponseInterface
@@ -304,13 +312,13 @@ class HieiMiddleware
     protected function determineDelayTimeout(array $options, ResponseInterface $response = null): float
     {
         if (is_callable($options['default_retry_multiplier'])) {
-            $defaultDelayTimeout = (float) call_user_func(
+            $defaultDelayTimeout = (float)call_user_func(
                 $options['default_retry_multiplier'],
                 $options['retry_count'],
                 $response
             );
         } else {
-            $defaultDelayTimeout = (float) $options['default_retry_multiplier'] * $options['retry_count'];
+            $defaultDelayTimeout = (float)$options['default_retry_multiplier'] * $options['retry_count'];
         }
 
         // Retry-After can be a delay in seconds or a date
@@ -329,17 +337,18 @@ class HieiMiddleware
      *
      * The spec allows the header value to either be a number of seconds or a datetime.
      *
-     * @param string $headerValue
+     * @param  string  $headerValue
+     *
      * @return float|null  The number of seconds to wait, or NULL if unsuccessful (invalid header)
      */
     protected function deriveTimeoutFromHeader(string $headerValue): ?float
     {
         // The timeout will either be a number or a HTTP-formatted date,
         // or seconds (integer)
-        if (trim($headerValue) === (string) (int) $headerValue) {
-            return (float) trim($headerValue);
+        if (trim($headerValue) === (string)(int)$headerValue) {
+            return (float)trim($headerValue);
         } elseif ($date = DateTime::createFromFormat(self::DATE_FORMAT, trim($headerValue))) {
-            return (float) $date->format('U') - time();
+            return (float)$date->format('U') - time();
         }
 
         return null;
