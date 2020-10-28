@@ -1,4 +1,15 @@
 {
+    "name": "reneiw\/hiei",
+    "description": "Http request Is Especially Import!.",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "wiener",
+            "email": "wiener@outlook.in",
+            "homepage": "https://github.com/reneiw/hiei",
+            "role": "Developer"
+        }
+    ],
     "autoload": {
         "psr-4": {
             "Reneiw\\Hiei\\": "src"
