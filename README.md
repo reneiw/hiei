@@ -14,6 +14,45 @@ I think you will like him.
 $ composer require reneiw/hiei -vvv
 ```
 
+## Quickstart
+
+```php
+
+use GuzzleHttp\Client;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\HandlerStack;
+use Reneiw\Hiei\HieiMiddleware;
+use Reneiw\Hiei\HTTPService;
+
+$stack = HandlerStack::create();
+$stack->push(
+    HieiMiddleware::factory(
+        [
+            //Set a maximum number of attempts per request, default 10
+            'max_retry_attempts' => 2,
+            // Only retry when status is equal to these response codes, default [429, 503]
+            'retry_on_status' => [204, 429, 503],
+        ]
+    )
+);
+$client = new Client(['handler' => $stack]);
+$http = new HTTPService(
+    $client, 
+    [
+        'errorCallback' => [
+            function ($method, $uri, $params, GuzzleException $e) {
+               logger()->info('123', [$method, $uri, $params, $e->getMessage()]);
+            },
+            function ($method, $uri, $params, GuzzleException $e) {
+               logger()->info('223', [$method, $uri, $params, $e->getMessage()]);
+            },
+        ],
+   ]
+);
+return $http->request('GET', 'http://www.google.com/generate_204');
+
+```
+
 ## Usage
 
 TODO
