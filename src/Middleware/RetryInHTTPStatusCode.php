@@ -17,7 +17,7 @@ class RetryInHTTPStatusCode
      *
      * @return Closure
      */
-    public function __invoke(int $maxTries, array $codes = [500, 502, 503, 504]): callable
+    public static function factory(int $maxTries, array $codes = [500, 502, 503, 504]): callable
     {
         return function (
             $retries,
