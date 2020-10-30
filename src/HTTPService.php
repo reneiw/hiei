@@ -13,7 +13,7 @@ class HTTPService
     protected array $errorCallback = [];
 
 
-    public function __construct(ClientInterface $client, $options)
+    public function __construct(ClientInterface $client, array $options = [])
     {
         $this->client = $client;
 

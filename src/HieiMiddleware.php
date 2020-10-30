@@ -69,6 +69,8 @@ class HieiMiddleware
 
         // Proxy enabled.  Toggle retry on or off per request
         'proxy_enable' => false,
+
+        'proxy_info_callback' => null,
     ];
 
     /**
@@ -271,6 +273,11 @@ class HieiMiddleware
                     $response,
                 ]
             );
+        }
+
+        //if use proxy, please use callback function out info.
+        if ($options['proxy_enable'] && $options['proxy_info_callback']) {
+            $options['proxy'] = call_user_func($options['proxy_info_callback']);
         }
 
         // Delay!
