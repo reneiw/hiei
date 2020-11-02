@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Reneiw\Hiei\Middleware;
-
 
 class ProxyGenerator
 {
