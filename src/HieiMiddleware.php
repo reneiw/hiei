@@ -123,8 +123,9 @@ class HieiMiddleware
             $options['retry_count'] = 0;
         }
 
+        //if use proxy, please use callback function out info.
         if ($options['proxy_enable'] && $options['proxy_info_callback']) {
-            $options['proxy'] = $options['proxy_info_callback'];
+            $options['proxy'] = call_user_func($options['proxy_info_callback']);
         }
 
         $next = $this->nextHandler;
@@ -277,11 +278,6 @@ class HieiMiddleware
                     $response,
                 ]
             );
-        }
-
-        //if use proxy, please use callback function out info.
-        if ($options['proxy_enable'] && $options['proxy_info_callback']) {
-            $options['proxy'] = call_user_func($options['proxy_info_callback']);
         }
 
         // Delay!
