@@ -6,6 +6,11 @@ class ProxyGenerator
 {
     private array $data;
 
+    /**
+     * ProxyGenerator constructor.
+     *
+     * @param  array  $data Proxy List
+     */
     public function __construct(array $data = [])
     {
         $this->data = $data;
@@ -21,10 +26,11 @@ class ProxyGenerator
         }
     }
 
-    public static function factory(array $data)
+    public static function factory(array $data, ?self $self = null)
     {
-        return function () use ($data) {
-            return new static($data);
+        return function () use ($data, &$self) {
+            $self ??= new static($data);
+            return $self();
         };
     }
 }
