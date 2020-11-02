@@ -69,8 +69,8 @@ class HieiMiddleware
 
         // Proxy enabled.  Toggle retry on or off per request
         'proxy_enable' => false,
-
-        'proxy_info_callback' => null,
+        // Proxy info. Support array, string, callback
+        'proxy_info' => null,
     ];
 
     /**
@@ -124,8 +124,10 @@ class HieiMiddleware
         }
 
         //if use proxy, please use callback function out info.
-        if ($options['proxy_enable'] && $options['proxy_info_callback']) {
-            $options['proxy'] = call_user_func($options['proxy_info_callback']);
+        if ($options['proxy_enable'] && $options['proxy_info']) {
+            $options['proxy'] = is_callable($options['proxy_info'])
+                ? call_user_func($options['proxy_info'])
+                : $options['proxy_info'];
         }
 
         $next = $this->nextHandler;
