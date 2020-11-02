@@ -17,7 +17,7 @@ class HTTPService
     {
         $this->client = $client;
 
-        if ($options['errorCallback']) {
+        if ($options['errorCallback'] ?? false) {
             $this->errorCallback = $options['errorCallback'];
         }
     }
