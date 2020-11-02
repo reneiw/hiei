@@ -123,6 +123,10 @@ class HieiMiddleware
             $options['retry_count'] = 0;
         }
 
+        if($options['proxy_enable'] && $options['proxy_info_callback']){
+            $options['proxy'] = $options['proxy_info_callback'];
+        }
+
         $next = $this->nextHandler;
         return $next($request, $options)
             ->then(
