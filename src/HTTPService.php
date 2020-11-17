@@ -10,16 +10,16 @@ use Psr\Http\Message\ResponseInterface;
 class HTTPService
 {
     protected ClientInterface $client;
-    protected array $errorCallback = [];
 
+    private array $defaultOptions = [
+        'on_error_callback' => null,
+        'on_success_callback' => null,
+    ];
 
     public function __construct(ClientInterface $client, array $options = [])
     {
-        $this->client = $client;
-
-        if ($options['errorCallback'] ?? false) {
-            $this->errorCallback = $options['errorCallback'];
-        }
+        $this->setClient($client);
+        $this->defaultOptions = array_replace($this->defaultOptions, $options);
     }
 
     public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
@@ -50,12 +50,20 @@ class HTTPService
          */
 
         try {
-            return $this->handleSuccess($this->getClient()->request($method, $uri, $guzzleParams));
+            $resp = $this->getClient()->request($method, $uri, $guzzleParams);
+            if ($this->defaultOptions['on_success_callback']) {
+                call_user_func_array(
+                    $this->defaultOptions['on_success_callback'],
+                    [$method, $uri, $params, $resp]
+                );
+            }
+            return $this->handleSuccess($resp);
         } catch (GuzzleException $e) {
-            if ($this->errorCallback) {
-                foreach ($this->errorCallback as $callback) {
-                    call_user_func_array($callback, [$method, $uri, $params, $e]);
-                }
+            if ($this->defaultOptions['on_error_callback']) {
+                call_user_func_array(
+                    $this->defaultOptions['on_error_callback'],
+                    [$method, $uri, $params, $e]
+                );
             }
             return $this->handleFailure($e);
         }
@@ -106,5 +114,11 @@ class HTTPService
     public function getClient(): ClientInterface
     {
         return $this->client;
+    }
+
+    public function setClient(ClientInterface $client)
+    {
+        $this->client = $client;
+        return $this;
     }
 }
