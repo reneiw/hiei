@@ -12,8 +12,8 @@ class HTTPService
     protected ClientInterface $client;
 
     private array $defaultOptions = [
-        'on_error_callback' => null,
-        'on_success_callback' => null,
+        'on_error_callback_stacks' => [],
+        'on_success_callback_stacks' => [],
     ];
 
     public function __construct(ClientInterface $client, array $options = [])
@@ -21,6 +21,7 @@ class HTTPService
         $this->setClient($client);
         $this->defaultOptions = array_replace($this->defaultOptions, $options);
     }
+
 
     public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
     {
@@ -51,19 +52,23 @@ class HTTPService
 
         try {
             $resp = $this->getClient()->request($method, $uri, $guzzleParams);
-            if ($this->defaultOptions['on_success_callback']) {
-                call_user_func_array(
-                    $this->defaultOptions['on_success_callback'],
-                    [$method, $uri, $params, $resp]
-                );
+            if ($this->defaultOptions['on_success_callback_stacks']) {
+                foreach ($this->defaultOptions['on_success_callback_stacks'] as $fn) {
+                    call_user_func_array(
+                        $fn,
+                        [$method, $uri, $params, $resp]
+                    );
+                }
             }
             return $this->handleSuccess($resp);
         } catch (GuzzleException $e) {
-            if ($this->defaultOptions['on_error_callback']) {
-                call_user_func_array(
-                    $this->defaultOptions['on_error_callback'],
-                    [$method, $uri, $params, $e]
-                );
+            if ($this->defaultOptions['on_error_callback_stacks']) {
+                foreach ($this->defaultOptions['on_error_callback_stacks'] as $fn) {
+                    call_user_func_array(
+                        $fn,
+                        [$method, $uri, $params, $e]
+                    );
+                }
             }
             return $this->handleFailure($e);
         }
