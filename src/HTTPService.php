@@ -22,7 +22,6 @@ class HTTPService
         $this->defaultOptions = array_replace($this->defaultOptions, $options);
     }
 
-
     public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
     {
         // Build the request parameters for Guzzle
@@ -74,7 +73,7 @@ class HTTPService
         }
     }
 
-    public function handleSuccess(ResponseInterface $resp): array
+    private function handleSuccess(ResponseInterface $resp): array
     {
         // Return Guzzle response and JSON-decoded body
         return [
@@ -86,7 +85,7 @@ class HTTPService
         ];
     }
 
-    public function handleFailure(GuzzleException $e): array
+    private function handleFailure(GuzzleException $e): array
     {
         $resp = null;
         $body = null;
