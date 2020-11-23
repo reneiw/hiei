@@ -14,6 +14,7 @@ class HTTPService
     private array $defaultOptions = [
         'on_error_callback_stacks' => [],
         'on_success_callback_stacks' => [],
+        'guzzle_options' => null,
     ];
 
     public function __construct(ClientInterface $client, array $options = [])
@@ -25,7 +26,7 @@ class HTTPService
     public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
     {
         // Build the request parameters for Guzzle
-        $guzzleParams = [];
+        $guzzleParams = $this->defaultOptions['guzzle_options'];
         if ($params !== null) {
             $guzzleParams[strtoupper($method) === 'GET' ? 'query' : 'json'] = $params;
         }
@@ -123,6 +124,17 @@ class HTTPService
     public function setClient(ClientInterface $client)
     {
         $this->client = $client;
+        return $this;
+    }
+
+    public function getOptions():array
+    {
+        return $this->defaultOptions;
+    }
+
+    public function setOptions(array $options)
+    {
+        $this->defaultOptions = array_replace($this->defaultOptions, $options);
         return $this;
     }
 }
