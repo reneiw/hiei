@@ -127,7 +127,7 @@ class HTTPService
         return $this;
     }
 
-    public function getOptions():array
+    public function getOptions(): array
     {
         return $this->defaultOptions;
     }
