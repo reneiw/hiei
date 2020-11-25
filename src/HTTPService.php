@@ -33,7 +33,7 @@ class HTTPService
 
         // Add custom headers
         if (count($headers) > 0) {
-            $guzzleParams['headers'] = array_merge($guzzleParams['headers'], $headers);
+            $guzzleParams['headers'] = array_replace($guzzleParams['headers'] ?? [], $headers);
         }
 
         /**
