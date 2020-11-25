@@ -14,7 +14,7 @@ class HTTPService
     private array $defaultOptions = [
         'on_error_callback_stacks' => [],
         'on_success_callback_stacks' => [],
-        'guzzle_options' => null,
+        'guzzle_options' => [],
     ];
 
     public function __construct(ClientInterface $client, array $options = [])
