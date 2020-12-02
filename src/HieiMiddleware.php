@@ -6,6 +6,7 @@ use Closure;
 use DateTime;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
+use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Create;
 use GuzzleHttp\Promise\Promise;
 use Psr\Http\Message\RequestInterface;
@@ -172,13 +173,20 @@ class HieiMiddleware
     protected function onRejected(RequestInterface $request, array $options): callable
     {
         return function ($reason) use ($request, $options) {
+            switch (true) {
+                case $reason instanceof BadResponseException:
+                case $reason instanceof RequestException:
+                case $reason instanceof ConnectException:
+                    if ($this->shouldRetryHttpResponse($options, $reason->getResponse())) {
+                        return $this->doRetry($request, $options, $reason->getResponse());
+                    }
+                    break;
+                default:
+                    break;
+            }
+
             // If was bad response exception, test if we retry based on the response headers
-            if ($reason instanceof BadResponseException) {
-                if ($this->shouldRetryHttpResponse($options, $reason->getResponse())) {
-                    return $this->doRetry($request, $options, $reason->getResponse());
-                }
-                // If this was a connection exception, test to see if we should retry based on connect timeout rules
-            } elseif ($reason instanceof ConnectException) {
+            if ($reason instanceof ConnectException) {
                 // If was another type of exception, test if we should retry based on timeout rules
                 if ($this->shouldRetryConnectException($options)) {
                     return $this->doRetry($request, $options);
