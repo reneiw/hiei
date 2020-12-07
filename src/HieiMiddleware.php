@@ -176,7 +176,6 @@ class HieiMiddleware
             switch (true) {
                 case $reason instanceof BadResponseException:
                 case $reason instanceof RequestException:
-                case $reason instanceof ConnectException:
                     if ($this->shouldRetryHttpResponse($options, $reason->getResponse())) {
                         return $this->doRetry($request, $options, $reason->getResponse());
                     }
