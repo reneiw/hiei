@@ -121,7 +121,7 @@ class HTTPService
         return $this->client;
     }
 
-    public function setClient(ClientInterface $client)
+    public function setClient(ClientInterface $client): HTTPService
     {
         $this->client = $client;
         return $this;
@@ -132,7 +132,7 @@ class HTTPService
         return $this->defaultOptions;
     }
 
-    public function setOptions(array $options)
+    public function setOptions(array $options): HTTPService
     {
         $this->defaultOptions = array_replace($this->defaultOptions, $options);
         return $this;

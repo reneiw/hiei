@@ -2,6 +2,8 @@
 
 namespace Reneiw\Hiei\Middleware;
 
+use Closure;
+
 class ProxyGenerator
 {
     private array $data;
@@ -26,7 +28,7 @@ class ProxyGenerator
         }
     }
 
-    public static function factory(array $data, ?self $self = null)
+    public static function factory(array $data, ?self $self = null): Closure
     {
         return function () use ($data, &$self) {
             $self ??= new static($data);

@@ -35,7 +35,7 @@ class HieiMiddleware
     /**
      * @var array
      */
-    private $defaultOptions = [
+    private array $defaultOptions = [
 
         // Retry enabled.  Toggle retry on or off per request
         'retry_enabled' => true,
