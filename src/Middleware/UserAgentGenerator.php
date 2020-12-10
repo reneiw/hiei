@@ -24,7 +24,7 @@ class UserAgentGenerator
         return UserAgent::random($this->data);
     }
 
-    public static function factory(array $data, ?self $self = null): Closure
+    public static function factory(array $data = [], ?self $self = null): Closure
     {
         return function () use ($data, &$self) {
             $self ??= new static($data);
