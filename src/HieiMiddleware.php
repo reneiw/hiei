@@ -72,6 +72,10 @@ class HieiMiddleware
         'proxy_enable' => false,
         // Proxy info. Support array, string, callback
         'proxy_info' => null,
+
+        'user_agent' => false,
+
+        'user_agent_info' => null,
     ];
 
     /**
@@ -129,6 +133,12 @@ class HieiMiddleware
             $options['proxy'] = is_callable($options['proxy_info'])
                 ? call_user_func($options['proxy_info'])
                 : $options['proxy_info'];
+        }
+
+        if ($options['user_agent'] && $options['user_agent_info']) {
+            $options['headers'] = is_callable($options['user_agent_info'])
+                ? call_user_func($options['user_agent_info'])
+                : $options['user_agent_info'];
         }
 
         $next = $this->nextHandler;
