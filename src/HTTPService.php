@@ -134,7 +134,7 @@ class HTTPService
 
     public function setOptions(array $options): HTTPService
     {
-        $this->defaultOptions = array_replace($this->defaultOptions, $options);
+        $this->defaultOptions = array_replace_recursive($this->defaultOptions, $options);
         return $this;
     }
 }
