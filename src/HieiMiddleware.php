@@ -234,7 +234,7 @@ class HieiMiddleware
      *
      * @return bool  TRUE if the response should be retried, FALSE if not
      */
-    protected function shouldRetryHttpResponse(array $options, ResponseInterface $response): bool
+    protected function shouldRetryHttpResponse(array $options, ?ResponseInterface $response): bool
     {
         $statuses = array_map('\intval', (array)$options['retry_on_status']);
 
