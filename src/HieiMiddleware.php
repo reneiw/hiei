@@ -241,7 +241,11 @@ class HieiMiddleware
         switch (true) {
             case $options['retry_enabled'] === false:
             case $this->countRemainingRetries($options) === 0: // No Retry-After header, and it is required?  Give up
-            case (!$response->hasHeader('Retry-After') && $options['retry_only_if_retry_after_header']):
+            case (
+                $response instanceof ResponseInterface
+                && !$response->hasHeader('Retry-After')
+                && $options['retry_only_if_retry_after_header']
+            ):
                 return false;
 
             // Conditions met; see if status code matches one that can be retried
