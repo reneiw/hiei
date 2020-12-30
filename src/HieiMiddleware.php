@@ -136,7 +136,7 @@ class HieiMiddleware
         }
 
         if ($options['user_agent'] && $options['user_agent_info']) {
-            $options['headers'] = is_callable($options['user_agent_info'])
+            $options['headers']['User-Agent'] = is_callable($options['user_agent_info'])
                 ? call_user_func($options['user_agent_info'])
                 : $options['user_agent_info'];
         }
