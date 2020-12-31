@@ -250,7 +250,7 @@ class HieiMiddleware
 
             // Conditions met; see if status code matches one that can be retried
             default:
-                return in_array($response->getStatusCode(), $statuses, true);
+                return is_null($response) ?: in_array($response->getStatusCode(), $statuses, true);
         }
     }
 
