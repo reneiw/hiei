@@ -1,5 +1,5 @@
 {
-    "name": "reneiw\/hiei",
+    "name": "reneiw/hiei",
     "description": "Http request Is Especially Import!.",
     "license": "MIT",
     "authors": [
@@ -19,7 +19,7 @@
         ]
     },
     "require": {
-        "php": "^7.4",
+        "php": "^7.4|^8.0",
         "campo/random-user-agent": "^1.3",
         "guzzlehttp/guzzle": "^7.0",
         "ext-json": "*"
