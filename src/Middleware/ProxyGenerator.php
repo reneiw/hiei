@@ -21,7 +21,7 @@ class ProxyGenerator
     public function __invoke()
     {
         switch (true) {
-            case count($this->data) == 1:
+            case count($this->data) === 1:
                 return current($this->data);
             default:
                 return array_shift($this->data);
@@ -32,6 +32,7 @@ class ProxyGenerator
     {
         return function () use ($data, &$self) {
             $self ??= new static($data);
+
             return $self();
         };
     }

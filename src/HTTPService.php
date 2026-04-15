@@ -23,7 +23,7 @@ class HTTPService
         $this->defaultOptions = array_replace($this->defaultOptions, $options);
     }
 
-    public function request(string $method, string $uri, array $params = null, array $headers = [], bool $sync = true)
+    public function request(string $method, string $uri, ?array $params = null, array $headers = [], bool $sync = true)
     {
         // Build the request parameters for Guzzle
         $guzzleParams = $this->defaultOptions['guzzle_options'];
@@ -43,6 +43,7 @@ class HTTPService
         if ($sync === false) {
             // Async request
             $promise = $this->getClient()->requestAsync($method, $uri, $guzzleParams);
+
             return $promise->then([$this, 'handleSuccess'], [$this, 'handleFailure']);
         }
 
@@ -60,6 +61,7 @@ class HTTPService
                     );
                 }
             }
+
             return $this->handleSuccess($resp);
         } catch (GuzzleException $e) {
             if ($this->defaultOptions['on_error_callback_stacks']) {
@@ -70,6 +72,7 @@ class HTTPService
                     );
                 }
             }
+
             return $this->handleFailure($e);
         }
     }
@@ -124,6 +127,7 @@ class HTTPService
     public function setClient(ClientInterface $client): HTTPService
     {
         $this->client = $client;
+
         return $this;
     }
 
@@ -135,6 +139,7 @@ class HTTPService
     public function setOptions(array $options): HTTPService
     {
         $this->defaultOptions = array_replace_recursive($this->defaultOptions, $options);
+
         return $this;
     }
 }

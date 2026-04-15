@@ -28,6 +28,7 @@ class UserAgentGenerator
     {
         return function () use ($data, &$self) {
             $self ??= new static($data);
+
             return $self();
         };
     }

@@ -8,7 +8,7 @@ use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use GuzzleHttp\Promise\Create;
-use GuzzleHttp\Promise\Promise;
+use GuzzleHttp\Promise\PromiseInterface;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -116,9 +116,9 @@ class HieiMiddleware
      * @param  RequestInterface  $request
      * @param  array  $options
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    public function __invoke(RequestInterface $request, array $options): Promise
+    public function __invoke(RequestInterface $request, array $options): PromiseInterface
     {
         // Combine options with defaults specified by this middleware
         $options = array_replace($this->defaultOptions, $options);
@@ -142,6 +142,7 @@ class HieiMiddleware
         }
 
         $next = $this->nextHandler;
+
         return $next($request, $options)
             ->then(
                 $this->onFulfilled($request, $options),
@@ -236,7 +237,7 @@ class HieiMiddleware
      */
     protected function shouldRetryHttpResponse(array $options, ?ResponseInterface $response): bool
     {
-        $statuses = array_map('\intval', (array)$options['retry_on_status']);
+        $statuses = array_map('intval', (array) $options['retry_on_status']);
 
         switch (true) {
             case $options['retry_enabled'] === false:
@@ -250,7 +251,7 @@ class HieiMiddleware
 
             // Conditions met; see if status code matches one that can be retried
             default:
-                return is_null($response) ?: in_array($response->getStatusCode(), $statuses, true);
+                return $response === null || in_array($response->getStatusCode(), $statuses, true);
         }
     }
 
@@ -263,11 +264,11 @@ class HieiMiddleware
      */
     protected function countRemainingRetries(array $options): int
     {
-        $retryCount = intval($options['retry_count'] ?? 0) ?: 0;
+        $retryCount = (int) ($options['retry_count'] ?? 0);
 
-        $numAllowed = intval($options['max_retry_attempts'] ?? 0) ?: $this->defaultOptions['max_retry_attempts'];
+        $numAllowed = (int) ($options['max_retry_attempts'] ?? 0) ?: $this->defaultOptions['max_retry_attempts'];
 
-        return max([$numAllowed - $retryCount, 0]);
+        return max($numAllowed - $retryCount, 0);
     }
 
     /**
@@ -279,9 +280,9 @@ class HieiMiddleware
      * @param  array  $options
      * @param  ResponseInterface|null  $response
      *
-     * @return Promise
+     * @return PromiseInterface
      */
-    protected function doRetry(RequestInterface $request, array $options, ResponseInterface $response = null): Promise
+    protected function doRetry(RequestInterface $request, array $options, ?ResponseInterface $response = null): PromiseInterface
     {
         // Increment the retry count
         ++$options['retry_count'];
@@ -294,8 +295,8 @@ class HieiMiddleware
             call_user_func_array(
                 $options['on_retry_callback'],
                 [
-                    (int)$options['retry_count'],
-                    (float)$delayTimeout,
+                    (int) $options['retry_count'],
+                    (float) $delayTimeout,
                     &$request,
                     &$options,
                     $response,
@@ -304,7 +305,7 @@ class HieiMiddleware
         }
 
         // Delay!
-        usleep(((int)$delayTimeout) * 1000000);
+        usleep(((int) $delayTimeout) * 1000000);
 
         // Return
         return $this($request, $options);
@@ -339,16 +340,16 @@ class HieiMiddleware
      *
      * @return float  Delay timeout, in seconds
      */
-    protected function determineDelayTimeout(array $options, ResponseInterface $response = null): float
+    protected function determineDelayTimeout(array $options, ?ResponseInterface $response = null): float
     {
         if (is_callable($options['default_retry_multiplier'])) {
-            $defaultDelayTimeout = (float)call_user_func(
+            $defaultDelayTimeout = (float) call_user_func(
                 $options['default_retry_multiplier'],
                 $options['retry_count'],
                 $response
             );
         } else {
-            $defaultDelayTimeout = (float)$options['default_retry_multiplier'] * $options['retry_count'];
+            $defaultDelayTimeout = (float) $options['default_retry_multiplier'] * $options['retry_count'];
         }
 
         // Retry-After can be a delay in seconds or a date
@@ -375,10 +376,10 @@ class HieiMiddleware
     {
         // The timeout will either be a number or a HTTP-formatted date,
         // or seconds (integer)
-        if (trim($headerValue) === (string)(int)$headerValue) {
-            return (float)trim($headerValue);
+        if (trim($headerValue) === (string) (int) $headerValue) {
+            return (float) trim($headerValue);
         } elseif ($date = DateTime::createFromFormat(self::DATE_FORMAT, trim($headerValue))) {
-            return (float)$date->format('U') - time();
+            return (float) $date->format('U') - time();
         }
 
         return null;
